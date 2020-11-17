@@ -20,13 +20,32 @@ void pp();
 void * calcRow(void*t);
 void *calcElement(void *t);
 
-int main()
+int main(int argc, char **argv)
 {
 
+   // printf("%s *---* %s *---* %s *---* %s\n",argv[0],argv[1],argv[2],argv[3]);
+    size_t l = 15;
+    char *file1;
+    char *file2;
+    char *file3;
+    file1 = (char *)malloc(l * sizeof(char));
+    file2 = (char *)malloc(l * sizeof(char));
+    file3 = (char *)malloc(l * sizeof(char));
+  //  scanf("%[^\n| ]s",file1);
+    if(argv[1]==NULL){
+        file1="a.txt";
+        file2="b.txt";
+        file3="c.txt";
+    }else{
+        file1=argv[1];
+        file2=argv[2];
+        file3=argv[3];
+    }
+
     FILE * fp;
-    fp = fopen("a.txt", "r");                     //open file a
+    fp = fopen(file1, "r");                     //open file a
     if (fp == NULL){
-        printf("Error in reading file");
+        printf("Error in reading file A");
         exit(EXIT_FAILURE);
     }
     getDim(fp,&n1,&m1);                           //read array a's size
@@ -41,9 +60,9 @@ int main()
 
 
 
-    fp = fopen("b.txt", "r");                    //open file b
+    fp = fopen(file2, "r");                    //open file b
     if (fp == NULL){
-        printf("Error in reading file");
+        printf("Error in reading file B");
         exit(EXIT_FAILURE);
     }
     getDim(fp,&n2,&m2);                             //read array a's size
@@ -76,7 +95,7 @@ int main()
     for(int i=0;i<n1;i++){
             rc=pthread_create(&threads[i],NULL,calcRow,(void *)i);            //passing row index
             if(rc){
-                printf("ERROR: return codr from pthread_create() is %d\n",rc);
+                printf("ERROR: return code from pthread_create() is %d\n",rc);
                 exit(-1);
             }
     }
@@ -90,16 +109,17 @@ int main()
     printf("Seconds taken %lu\n", stop1.tv_sec - start1.tv_sec);
     printf("Microseconds taken: %lu\n", stop1.tv_usec - start1.tv_usec);
     printf("number of threads = %d\n",n1);
+    printf("\n-----------------------------------------\n\n");
 
 
-    if((fp=fopen("c.out", "w"))==NULL) {                    //open c.out file
+  /*  if((fp=fopen("c.out", "w"))==NULL) {                    //open c.out file
         printf("Cannot open file.\n");
         exit(0);
     }
     if(fwrite(arrR1, sizeof(float), m1*n2, fp) != m1*n2)           //save the result matrix
         printf("File write error.");
     fclose(fp);
-
+*/
 //*******************************Thread with one element***************************************
 
 
@@ -127,7 +147,7 @@ int main()
             tdata[v].m=j;
             rc_2=pthread_create(&threads_2[v++],NULL,calcElement,(void *) &tdata[v]);
             if(rc_2){
-                printf("ERROR: return codr from pthread_create() is %d\n",rc);
+                printf("ERROR: return code from pthread_create() is %d\n",rc);
                 exit(-1);
             }
            // free(tdata);
@@ -143,8 +163,8 @@ int main()
     printf("Microseconds taken: %lu\n", stop.tv_usec - start.tv_usec);
     printf("number of threads = %d\n",number_threads);
 
-     if((fp=fopen("c.txt", "w"))==NULL) {                    //open c.out file
-        printf("Cannot open file.\n");
+     if((fp=fopen(file3, "w"))==NULL) {                    //open c.out file
+        printf("Error: Cannot open file to save result.");
         exit(0);
     }
     for(int i=0;i<n1;i++){
@@ -159,7 +179,7 @@ int main()
 
 
 //*********************************************************************************************
-    pp();                                                            //print all arrays
+   // pp();                                                            //print all arrays
     free(arrA);free(arrB);free(arrR1);free(arrR2);                   //free all arrays memory
     pthread_exit(NULL);                                              //exit the main thread
     return 0;
